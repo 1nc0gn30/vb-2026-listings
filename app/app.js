@@ -16,6 +16,74 @@ const els = {
   cardTemplate: document.querySelector('#cardTemplate'),
 };
 
+const UNIQUE_WEBSITE_ANGLES = {
+  'Food and Beverage': [
+    'Show menu highlights, hours, and ordering options before customers compare alternatives.',
+    'Use location pages and photos so nearby searchers pick this spot first.',
+    'Capture repeat business with events, specials, and loyalty callouts.',
+  ],
+  'Home and Trade Services': [
+    'Separate service pages by job type so urgent buyers find the exact offer quickly.',
+    'Display licenses, before/after work, and guarantees to reduce trust friction.',
+    'Route leads with quote forms that collect scope, timeline, and neighborhood details.',
+  ],
+  'Beauty and Personal Care': [
+    'Highlight specialties and style portfolio so clients can self-qualify before booking.',
+    'Pair booking flow with service prep guidance to reduce no-shows and mismatched appointments.',
+    'Stand out locally with clear brand visuals and social proof from real clients.',
+  ],
+  'Health and Wellness': [
+    'Clarify services, credentials, and care approach so prospects feel safe reaching out.',
+    'Use conversion-focused intake paths for consultations, classes, or appointments.',
+    'Strengthen local authority through educational content and trust signals.',
+  ],
+  'Professional and B2B Services': [
+    'Position offers by industry/use case so decision makers understand fit in one scan.',
+    'Use proof-driven pages with case outcomes, process, and expected timelines.',
+    'Capture higher-quality leads with forms that qualify budget, role, and project scope.',
+  ],
+  'Retail and E-commerce': [
+    'Differentiate product quality and brand story beyond marketplace price competition.',
+    'Support online and in-store conversion with inventory, pickup, and shipping clarity.',
+    'Increase repeat purchases using collection pages, bundles, and lifecycle offers.',
+  ],
+  'Automotive and Marine': [
+    'Publish issue-specific service pages so urgent customers choose faster with confidence.',
+    'Display turnaround times, certifications, and warranty details to reduce call hesitation.',
+    'Use structured intake forms to pre-qualify jobs and improve scheduling efficiency.',
+  ],
+  'Events and Creative': [
+    'Use visual-first pages that prove style quality before prospects request pricing.',
+    'Show packaged offers and availability windows to shorten back-and-forth sales cycles.',
+    'Convert interest with portfolio-driven landing pages for each event type.',
+  ],
+  'Childcare and Education': [
+    'Build parent trust with credentials, safety standards, and transparent program details.',
+    'Simplify enrollment with clear schedules, age groups, and inquiry paths.',
+    'Use program pages to communicate outcomes and differentiate from nearby options.',
+  ],
+  'Real Estate and Property': [
+    'Present listings/services with clear next steps to capture buyer and owner intent quickly.',
+    'Use neighborhood-specific pages to rank for high-intent local search terms.',
+    'Show proof of outcomes, process, and response times to win trust faster.',
+  ],
+  'Personal and Local Services': [
+    'Define service scope and pricing expectations so inquiries are better qualified.',
+    'Use location signals and reviews to earn trust from nearby prospects quickly.',
+    'Capture demand from mobile users with fast call, text, and booking actions.',
+  ],
+  'Nonprofit and Community': [
+    'Clarify mission impact and programs so supporters understand value immediately.',
+    'Drive volunteer and donor actions with focused campaign landing pages.',
+    'Strengthen credibility with updates, outcomes, and local partnership visibility.',
+  ],
+  default: [
+    'Differentiate this business from similar local options with clearer positioning and proof.',
+    'Convert search traffic into leads using focused service pages and direct contact paths.',
+    'Build trust faster through testimonials, certifications, and up-to-date business details.',
+  ],
+};
+
 function uniqueValues(list, key) {
   return [...new Set(list.map((item) => item[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
@@ -40,6 +108,21 @@ function businessSearchText(item) {
     item.city,
     item.zip,
   ].join(' ').toLowerCase();
+}
+
+function categoryAngles(item) {
+  return UNIQUE_WEBSITE_ANGLES[item.category] || UNIQUE_WEBSITE_ANGLES.default;
+}
+
+function uniqueReasons(item) {
+  const name = titleForBusiness(item);
+  const categoryName = (item.category || 'local business').toLowerCase();
+  const angles = categoryAngles(item).slice(0, 2);
+
+  return [
+    `${name} can stand out from other ${categoryName} options with clearer positioning and trust signals.`,
+    ...angles,
+  ];
 }
 
 function renderStats(items) {
@@ -129,7 +212,14 @@ function renderCards(items) {
       ideaList.appendChild(li);
     });
 
-    node.querySelector('.why').textContent = `Why they likely need a website: ${item.why_need_website}`;
+    const reasonList = node.querySelector('.reasons');
+    uniqueReasons(item).forEach((reason) => {
+      const li = document.createElement('li');
+      li.textContent = reason;
+      reasonList.appendChild(li);
+    });
+
+    node.querySelector('.why').textContent = `Primary reason: ${item.why_need_website}`;
     node.querySelector('.sources').innerHTML = `Source: <a href="${item.source_pdf}">PDF</a> | <a href="${item.source_xlsx}">XLSX</a> | Confidence ${item.confidence}%`;
 
     fragment.appendChild(node);
